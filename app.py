@@ -1,15 +1,16 @@
 
 from order import Order
-from user import Client, Delivery
+from modes import Client, Delivery
 
 
 class App:
-    def __init__(self, name) -> None:
+    def __init__(self, mode) -> None:
         self.__name= name
         self.clients=[]
+        self.products=[]
+        self.pendientorders=[]
         self.delivery=[]
         self.waiters=[]
-        self.orders=[]
     
     def __str__(self):
         return self.__name
@@ -23,7 +24,8 @@ class App:
 
 #-Metodos para manejar clientes-#
 
-    def addUser(self, user):
+    def add(self,)
+    Client(self, ):
         
         if isinstance(user, Client):
             if Client.state == True:

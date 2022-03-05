@@ -23,3 +23,4 @@ mi_codigo.save(directorio+"/prueba")
 states=("pendiente", "procesado","enviado","completado","cancelado")
 
 print(states[1])
+

@@ -7,6 +7,8 @@ Created on Fri Mar  4 19:18:46 2022
 
 import sqlite3
 
+from numpy import str0
+
 class DataBase:
     
     __db_name = ""
@@ -43,6 +45,14 @@ class DataBase:
     def disconnect(self):
         DataBase.__conn.close()
     
+    def insert(self, _sql:str):
+        try:
+            _cursor = DataBase.__conn.cursor()
+            _cursor.execute(_sql)
+        finally:
+            DataBase.__conn.commit()
+            _cursor.close()
+    
     def execSql(self, _sql, _tupla=()):
         #print (f"SQL: {_sql}", _tupla if _tupla is not () else "")
         
@@ -77,9 +87,9 @@ class DataBase:
             _cursor.close()
             return _row
 
-        
+'''        
 conexion = DataBase("./database.db")
-print("Conexion establecida:", conexion.connect())
+print("\nConexion establecida:", conexion.connect(), "\n")
 
 table = "orders"
 s=1
@@ -94,5 +104,5 @@ sql = f"SELECT elements FROM {table} WHERE service = {s}"
 
 rows=conexion.selectAllSql(sql)
 print(rows)
-
+'''
 
