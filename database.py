@@ -16,10 +16,17 @@ class DataBase:
     
     def __init__(self,db_name:str):
         DataBase.__db_name = db_name
-     
-    def select(self,sql:str):
-        query = 'SELECT * FROM'+ table + O 
     
+    def connect(self):
+        try:
+            DataBase.__conn = sqlite3.connect(DataBase.__db_name)
+            return True
+        except:
+            return False
+    
+    def disconnect(self):
+        DataBase.__conn.close()
+
     '''
     def run_query(self, query, parameters = ()):
         with sqlite3.connect(self.db_name) as conn:
@@ -35,16 +42,7 @@ class DataBase:
         db_rows = self.run_query(query)
         print(db_rows)
     '''
-    def connect(self):
-        try:
-            DataBase.__conn = sqlite3.connect(DataBase.__db_name)
-            return True
-        except:
-            return False
-    
-    def disconnect(self):
-        DataBase.__conn.close()
-    
+    '''
     def insert(self, _sql:str):
         try:
             _cursor = DataBase.__conn.cursor()
@@ -52,10 +50,10 @@ class DataBase:
         finally:
             DataBase.__conn.commit()
             _cursor.close()
-    
+    '''
+
     def execSql(self, _sql, _tupla=()):
-        #print (f"SQL: {_sql}", _tupla if _tupla is not () else "")
-        
+    
         try:
             _cursor = DataBase.__conn.cursor()
             if _tupla == ():

@@ -4,7 +4,11 @@ class Product:
         self.__description = description
         self.__price = price
         self.__available = True
-    
+
+    @property 
+    def id(self):
+        return self.__id
+
     @property
     def description(self):
         return self.__description
