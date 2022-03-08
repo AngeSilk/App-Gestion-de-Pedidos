@@ -1,12 +1,5 @@
 from database import DataBase
 
-class Guest:
-    def __init__(self,name:str, code:str):
-        self.__name = name
-        self.__sharecode = code
-    
-    def joinorder(self):
-        pass
 
 class User:
     def __init__(self, name:str, lastname:str, DNI:str, password:str, phone:str) -> None:
@@ -68,7 +61,8 @@ class Admin(User):
             db = DataBase("./database.db")
             print("\nConexion establecida:", db.connect(), "\n")
 
-            datos=(client.name, client.lastname, client.dni, client.phone, client.password, client.address, client.avaliable)
+            #datos=(client.name, client.lastname, client.dni, client.phone, client.password, client.address, client.avaliable)
+            datos=client.current()
             sql = 'INSERT INTO clients(name, lastname, dni, phone, password, address, available) VALUES (?,?,?,?,?,?,?)'
             db.execSql(sql,datos)
             print("Cliente Agregado")
@@ -84,7 +78,7 @@ class Admin(User):
         try:
             db = DataBase("./database.db")
             print("\nConexion establecida:", db.connect(), "\n")
-            if value == True:
+            if value:
                 sql=f'UPDATE clients SET available=1 WHERE dni="{client.dni}"'
             else:
                 sql=f'UPDATE clients SET available=0 WHERE dni="{client.dni}"'
@@ -104,7 +98,7 @@ class Admin(User):
             print("Producto Agregado")
             return True
         except:
-            print("E")
+            print("Producto repetido")
             return False
         finally:
             db.disconnect()
@@ -119,12 +113,17 @@ class Admin(User):
             else:
                 sql=f'UPDATE products SET available=0 WHERE id="{product.id}"'
             db.execSql(sql)
-            print("Cliente modificado")
+            print("Producto modificado")
         finally:
             db.disconnect()
-
-    def ModPrice(self, product:object, price):
+'''
+    def ModPrice(self, product_id, price):
+        
+        try:
+            sql=f'SELECT id FROM clients '
+        finally:   
         pass
+'''
 
 class Client(User):
     
@@ -140,7 +139,16 @@ class Client(User):
     def address(self, address):
         self.__address = address
     
-    def takeorder(self):
+    def current(self):
+        tupla=(self.name, self.lastname, self.dni, self.phone, self.password, self.address, self.avaliable)
+        print(tupla)
+        return tupla
+    
+    def makeorder(self, cliente:object, producto:object, quantity):
+        
+        pass
+        
+        
         pass
 
     def addGuest(self):
@@ -162,3 +170,11 @@ class Delivery(User):
     def __init__(self):
         Delivery.delivery_ID =+ 1
         self.__state = "on_hold"
+        
+class Guest:
+    def __init__(self,name:str, code:str):
+        self.__name = name
+        self.__sharecode = code
+    
+    def joinorder(self):
+        pass

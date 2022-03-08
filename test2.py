@@ -5,6 +5,8 @@ from modes import *
 #Instancio una App
 App_Admin=App("Vista de Admin")
 
+App_Client=App("Vista Cliente")
+
 #Instancio un administrador para la aplicacion
 admin=Admin("Angelo","Silke","41632448", "12348578","3754436348")
 
@@ -24,10 +26,17 @@ cliente=Client("Angelo", "Silke", "41632448", "password", "3754436348","Sarratea
 
 #Instancio un producto
 
-producto = Product("Carne",110)
+#producto = Product("Pollo",120)
 
 #Agregar Producto
 admin.addProduct(producto)
+
+#Realizar un pedido
+#cliente.makeorder()
+
+#Traer productos
+App_Client.run(cliente)
+
 '''
 Cliente2=App(cliente, password)
 

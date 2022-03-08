@@ -5,6 +5,8 @@ Created on Fri Mar  4 19:18:46 2022
 @author: Angelo
 """
 
+#SELECT MAX (id) FROM table        colation
+
 import sqlite3
 
 from numpy import str0
@@ -51,7 +53,9 @@ class DataBase:
             DataBase.__conn.commit()
             _cursor.close()
     '''
-
+    
+    #Usar para INSERT, UPDATE, DELETE
+    
     def execSql(self, _sql, _tupla=()):
     
         try:
@@ -63,7 +67,8 @@ class DataBase:
             DataBase.__conn.commit()
         finally:
             _cursor.close()
-        
+    
+    #Todas las ocurrencias
     def selectAllSql(self, _sql ):
         #print ( f"SQL: {_sql}" )
         _rows = None
@@ -75,12 +80,13 @@ class DataBase:
             _cursor.close()
             return _rows
     
+    #Primera ocurrencia
     def selectOneSql(self, _sql):
         _row = None
         try:
             _cursor = DataBase.__conn.cursor()
             _cursor.execute( _sql )
-            _row = _cursor.fetchone()
+            _row = _cursor.fetchone() 
         finally:
             _cursor.close()
             return _row

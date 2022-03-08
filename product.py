@@ -33,6 +33,4 @@ class Product:
     def available(self, available:bool):
         self.__available = available
     
-    def getproducts(self):
-        products=[]
         
