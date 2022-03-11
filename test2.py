@@ -1,17 +1,15 @@
 from product import Product
 from appV1 import App
-from modes import *
+from users import *
 
-#Instancio una App
-App_Admin=App("Vista de Admin")
-
-App_Client=App("Vista Cliente")
+#Instancio la App
+app=App("Gestion de Pedidos para Restaurante", "database.db")
 
 #Instancio un administrador para la aplicacion
 admin=Admin("Angelo","Silke","41632448", "12348578","3754436348")
 
 #Ejecuto la aplicación  como administrador
-App_Admin.run(admin)
+#app.run(admin)
 
 #Instancio un Cliente
 cliente=Client("Angelo", "Silke", "41632448", "password", "3754436348","Sarratea371")
@@ -29,14 +27,17 @@ cliente=Client("Angelo", "Silke", "41632448", "password", "3754436348","Sarratea
 #producto = Product("Pollo",120)
 
 #Agregar Producto
-admin.addProduct(producto)
+#admin.addProduct(producto)
 
 #Realizar un pedido
 #cliente.makeorder()
 
 #Traer productos
-App_Client.run(cliente)
+#app.run(cliente)
 
+Mati=Guest("Mati", "111111111111")
+
+app.run(Mati)
 '''
 Cliente2=App(cliente, password)
 

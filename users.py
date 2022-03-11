@@ -54,24 +54,6 @@ class Admin(User):
 
     def __init__(self, name:str, lastname:str, DNI:str, password:str, phone:str):
         User.__init__(self, name, lastname, DNI, password, phone)
-    
-    def addClient(self, client:object): #grabar en la base de datos
-            
-        try:
-            db = DataBase("./database.db")
-            print("\nConexion establecida:", db.connect(), "\n")
-
-            #datos=(client.name, client.lastname, client.dni, client.phone, client.password, client.address, client.avaliable)
-            datos=client.current()
-            sql = 'INSERT INTO clients(name, lastname, dni, phone, password, address, available) VALUES (?,?,?,?,?,?,?)'
-            db.execSql(sql,datos)
-            print("Cliente Agregado")
-            return True
-        except:
-            print("No se pudo cargar el cliente")
-            return False
-        finally:
-            db.disconnect()
            
     def enableCient(self, client:object, value:bool):
         
@@ -144,14 +126,14 @@ class Client(User):
         print(tupla)
         return tupla
     
+    
+
     def makeorder(self, cliente:object, producto:object, quantity):
         
         pass
         
-        
-        pass
 
-    def addGuest(self):
+    def addedGuest(self, guest:object ,order:object):
         pass
         
 
@@ -176,5 +158,13 @@ class Guest:
         self.__name = name
         self.__sharecode = code
     
+    @property
+    def name(self):
+        return self.__name
+        
+    @property
+    def sharecode(self):
+        return self.__sharecode
+
     def joinorder(self):
         pass

@@ -5,11 +5,7 @@ Created on Fri Mar  4 19:18:46 2022
 @author: Angelo
 """
 
-#SELECT MAX (id) FROM table        colation
-
 import sqlite3
-
-from numpy import str0
 
 class DataBase:
     
@@ -29,31 +25,6 @@ class DataBase:
     def disconnect(self):
         DataBase.__conn.close()
 
-    '''
-    def run_query(self, query, parameters = ()):
-        with sqlite3.connect(self.db_name) as conn:
-            cursor = conn.cursor()
-            results = cursor.execute(query, parameters)
-            conn.commit()
-            conn.close()
-        return results
-    
-    
-    def get_orders(self):
-        query = 'SELECT * FROM orders ORDER BY id DESC'
-        db_rows = self.run_query(query)
-        print(db_rows)
-    '''
-    '''
-    def insert(self, _sql:str):
-        try:
-            _cursor = DataBase.__conn.cursor()
-            _cursor.execute(_sql)
-        finally:
-            DataBase.__conn.commit()
-            _cursor.close()
-    '''
-    
     #Usar para INSERT, UPDATE, DELETE
     
     def execSql(self, _sql, _tupla=()):
@@ -90,6 +61,35 @@ class DataBase:
         finally:
             _cursor.close()
             return _row
+    
+   
+    #SELECT MAX (id) FROM table        colation
+    
+    '''
+    def run_query(self, query, parameters = ()):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            results = cursor.execute(query, parameters)
+            conn.commit()
+            conn.close()
+        return results
+    
+    
+    def get_orders(self):
+        query = 'SELECT * FROM orders ORDER BY id DESC'
+        db_rows = self.run_query(query)
+        print(db_rows)
+    '''
+    '''
+    def insert(self, _sql:str):
+        try:
+            _cursor = DataBase.__conn.cursor()
+            _cursor.execute(_sql)
+        finally:
+            DataBase.__conn.commit()
+            _cursor.close()
+    '''
+    
 
 '''        
 conexion = DataBase("./database.db")

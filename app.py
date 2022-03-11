@@ -1,6 +1,6 @@
 
 from order import Order
-from modes import Client, Delivery
+from users import Client, Delivery
 
 
 class App:
