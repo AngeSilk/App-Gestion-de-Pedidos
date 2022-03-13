@@ -1,7 +1,5 @@
 import tkinter as tk
 
-from matplotlib.pyplot import text
-
 
 class Main(tk.Tk):
     def __init__(self):

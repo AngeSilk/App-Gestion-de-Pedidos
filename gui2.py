@@ -31,8 +31,8 @@ class GUI(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def validate(self):
-        pass
+    def db_check(self, values):
+        print(values)
 
     def forguet_password(self):
         print("Sos un boludo")
@@ -87,41 +87,138 @@ class Register(tk.LabelFrame):
         self["text"]="Registrarse"
         self.controller = controller
 
-        
         self.name_tag = tk.StringVar()
-        lastname_tag = tk.StringVar()
-        dni_tag = tk.StringVar()
-        pass_tag = tk.StringVar()
-        prefix = tk.StringVar()
-        number = tk.StringVar()
-        address_tag = tk.StringVar()
+        self.lastname_tag = tk.StringVar()
+        self.dni_tag = tk.StringVar()
+        self.pass_tag = tk.StringVar()
+        self.prefix = tk.StringVar()
+        self.number = tk.StringVar()
+        self.address_tag = tk.StringVar()
+
+        self.error = tk.StringVar()
 
         tk.Label(self, text="Nombre:").grid(row=0, column=0)
-        tk.Entry(self, textvariable= self.name_tag).grid(row=0, column=1, columnspan=12, ipadx=15, padx=10)
+        Letters(self, self.name_tag).grid(row=0, column=1, columnspan=12, ipadx=15, padx=10)
         tk.Label(self, text="Apellido:").grid(row=1, column=0)
-        tk.Entry(self, textvariable=lastname_tag).grid(row=1, column=1, columnspan=12, ipadx=15, padx=10)
+        Letters(self, self.lastname_tag).grid(row=1, column=1, columnspan=12, ipadx=15, padx=10)
         tk.Label(self, text="DNI:", justify="left").grid(row=2, column=0)
-        tk.Entry(self, textvariable=dni_tag).grid(row=2, column=1, columnspan=12, ipadx=15, padx=10)
+        Digits(self, self.dni_tag).grid(row=2, column=1, columnspan=12, ipadx=15, padx=10)
         tk.Label(self, text="Contraseña:").grid(row=3, column=0)
-        tk.Entry(self, textvariable=pass_tag).grid(row=3, column=1, columnspan=5, ipadx=15, padx=10)
+        tk.Entry(self, textvariable=self.pass_tag).grid(row=3, column=1, columnspan=5, ipadx=15, padx=10)
         tk.Label(self, text="Telefono:").grid(row=4, column=0)
         tk.Label(self, text="+54", width=3).grid(row=4, column=1, columnspan=1)
-        tk.Entry(self, width=4, textvariable=prefix).grid(row=4, column=2)
+        Digits(self, self.prefix, width=4).grid(row=4, column=2)
         tk.Label(self, text="-").grid(row=4, column=3)
-        tk.Entry(self, width=6, textvariable=number).grid(row=4, column=4)
-        
-        #phone_tag= prefix + number
+        Digits(self, self.number, width=6).grid(row=4, column=4)
+    
         tk.Label(self, text="Direccion:").grid(row=5, column=0)
-        tk.Entry(self, textvariable=address_tag).grid(row=5, column=1, columnspan=12, ipadx=15, padx=10)
+        tk.Entry(self, textvariable=self.address_tag).grid(row=5, column=1, columnspan=12, ipadx=15, padx=10)
         
-        
-        tk.Button(self, text="Atras", command=lambda: controller.show_frame("Login")).grid(row=6, column=1, pady=20)
-        tk.Button(self, text="Continuar", command=lambda: self.get_values(), width=6).grid(row=6, column=2, columnspan=3)
+        tk.Label(self, textvariable=self.error).grid(row=6, column=0, columnspan=13)
 
-    def get_values(self):
-        print(self.name_tag.get())
+        tk.Button(self, text="Atras", command=lambda: controller.show_frame("Login")).grid(row=7, column=1, pady=20)
+        tk.Button(self, text="Continuar", command=lambda: self.validate(), width=6).grid(row=7, column=2, columnspan=3)
+
+        self.name_tag.trace("w", lambda *args: limitador(self.name_tag, 20))
+        self.lastname_tag.trace("w", lambda *args: limitador(self.lastname_tag, 20))
+        self.dni_tag.trace("w", lambda *args: limitador(self.dni_tag, 8))
+        self.pass_tag.trace("w", lambda *args: limitador(self.pass_tag, 20))
+        self.prefix.trace("w", lambda *args: limitador(self.prefix, 4))
+        self.number.trace("w", lambda *args: limitador(self.number, 6))
+        self.address_tag.trace("w", lambda *args: limitador(self.address_tag, 30))
+
+
+        def limitador(widget, n):
+            if len(widget.get()) > 0:
+                #Limita la cantidad a n caracteres
+                widget.set(widget.get()[:n])
+
+    def validate(self):
+        name=self.name_tag.get()
+        lastname=self.lastname_tag.get()
+        dni=self.dni_tag.get()
+        passwd=self.pass_tag.get()
+        prefix=self.prefix.get()
+        number=self.number.get()
+        address=self.address_tag.get()
+        
+        error=["Error \n"]
+
+        if not name.isalpha(): error.append("- El nombre no puede contener numeros\n")
+        if not lastname.isalpha(): error.append("- El Appelido no puede contener numeros\n")
+        if dni.isnumeric(): 
+            if len(dni) != 8: error.append("- El Dni debe tener 8 digitos\n")
+        else: error.append("- El Dni no puede contener letras\n")
+        if not prefix.isnumeric(): error.append("- El Prefijo Telefonico no puede contener letras\n")
+        if not number.isnumeric(): error.append("- El Numero Telefonico es invalido\n")
+        if not address.isalnum(): error.append("- La direccion solo debe contener lestras y numeros\n")
+    
+        if len(passwd) < 6: error.append("- La contraseña debe tener al menos 6 caracteres\n")
+        if len(passwd) > 20: error.append("- La contraseña no puede tener mas de 20 caracteres\n")
+        if not any(char.isdigit() for char in passwd): error.append("- La contraseña debe tener almenos un numero\n")
+        if not any(char.isupper() for char in passwd): error.append("- La contraseña debe tener almenos una MAYUSCULA\n")
+        if not any(char.islower() for char in passwd): error.append("- La contraseña debe tener almenos una minuscula\n")    
+
+        self.error.set("")        
+        for e in error:
+            val1= self.error.get()
+            val2= str(e)
+            string=val1 + val2
+            self.error.set(string)
+
+
+        #self.controller.db_check()
+        
+class Letters(tk.Entry):
+    def __init__(self, master=None, var=None, **kwargs):
+        self.var = var
+        #self.var = tk.StringVar()
+        tk.Entry.__init__(self, master, textvariable=self.var, **kwargs)
+        self.old_value = ''
+        self.var.trace('w', self.check)
+        self.get, self.set = self.var.get, self.var.set
+        
+        #self.bind("<BackSpace>", lambda _: self.reset(self.old_value))
+    '''
+    def reset(self, old_value):
+        print(old_value)
+        print(len(old_value))
+        if len(old_value)==1:
+            self.set=('')
+    '''
+    def check(self, *args):
+        
+        if len(self.old_value)== 1 and self.bind("<BackSpace>", lambda _: True):
+            self.set=('')
+        else:
+            if self.get().isalpha(): 
+                # the current value is only digits; allow this
+                    self.old_value = self.get()
+            else:
+                # there's non-digit characters in the input; reject this 
+                self.set(self.old_value)
         
     
+        
+        
+    
+
+class Digits(tk.Entry):
+    def __init__(self, master=None, var=None, **kwargs):
+        self.var = var
+        #self.var = tk.StringVar()
+        tk.Entry.__init__(self, master, textvariable=self.var, **kwargs)
+        self.old_value = ''
+        self.var.trace('w', self.check)
+        self.get, self.set = self.var.get, self.var.set
+
+    def check(self, *args):
+        if self.get().isdigit(): 
+            # the current value is only digits; allow this
+            self.old_value = self.get()
+        else:
+            # there's non-digit characters in the input; reject this 
+            self.set(self.old_value)
 
 
 def main():
