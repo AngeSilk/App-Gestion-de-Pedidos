@@ -72,7 +72,7 @@ class App:
 
             print(p[0])
 
-    def enable_Guest(self, guest:object):
+    def enable_Guest(self, guest:Guest):
         
         #Comprobar si existe una orden activa con el codigo compartido
         try:
@@ -88,23 +88,43 @@ class App:
                 return id 
         except:
             print("Error al validar el invitado")
+            return False
         finally:
             self.db.disconnect()
     
-    def addClient(self, client:object): #grabar en la base de datos
+    def addClient(self, client:Client): #grabar en la base de datos
             
         try:
-            db = DataBase("./database.db")
-            print("\nConexion establecida:", db.connect(), "\n")
-
+            print("\nConexion establecida:", self.db.connect(), "\n")
             #datos=(client.name, client.lastname, client.dni, client.phone, client.password, client.address, client.avaliable)
             datos=client.current()
-            sql = 'INSERT INTO clients(name, lastname, dni, phone, password, address, available) VALUES (?,?,?,?,?,?,?)'
-            db.execSql(sql,datos)
+            sql = 'INSERT INTO user(name, lastname, dni, phone, password, address, available, role) VALUES (?,?,?,?,?,?,?, 1)'
+            self.db.execSql(sql,datos)
             print("Cliente Agregado")
             return True
         except:
             print("No se pudo cargar el cliente")
             return False
         finally:
-            db.disconnect()
+            self.db.disconnect()
+
+    #Validar en la base de datos, si existe, envía el rol que cumple el usuario
+    def validate_user(self, user:User):
+        
+        try:
+            print("\nConexion establecida:", self.db.connect(), "\n")
+            
+            dni=user.dni
+            passwd=user.password
+    
+            sql = f'SELECT id, role FROM user WHERE dni="{dni}" AND password="{passwd}"'
+            tupla=self.db.selectAllSql(sql)
+            if tupla:
+                print("Se encontró el usuario")
+                info=tupla[0]
+                return info
+            else:
+                print("Los datos no coinciden con los usuarios registrados")
+                return False
+        finally:
+            self.db.disconnect()
