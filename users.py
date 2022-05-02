@@ -1,28 +1,51 @@
-from database import DataBase
-
+from numpy import product
+from product import *
+from plum import dispatch
 
 class User:
-    def __init__(self, name:str, lastname:str, DNI:str, password:str, phone:str) -> None:
+    
+    #Sobre carga del metodo init de user
+    @dispatch
+    def __init__(self, DNI:str, password:str):
+        self.__DNI = DNI
+        self.__password = password
+        self.__role = None
+    
+    @dispatch
+    def __init__(self, id:int, name:str, lastname:str, DNI:str, phone:str, role:int) -> None:
+       self.__id = id
        self.__name = name
        self.__lastname = lastname
        self.__DNI = DNI
-       self.__password = password
+       #self.__password = password
        self.__phone = phone
        self.__state = True
+       self.__role = role
+    
+    @property
+    def id(self):
+        return self.__id
+    
+    @id.setter
+    def id(self, id):
+        self.__id = id
     
     @property
     def name(self):
         return self.__name
+    
     @property
     def lastname(self):
         return self.__lastname
+    
     @property 
     def dni(self):
         return self.__DNI
+    
     @property 
     def password(self):
         return self.__password
-    
+
     @password.setter
     def password(self, password):
         self.__password = password 
@@ -50,62 +73,22 @@ class User:
     def state(self, state):
         self.__state = state
 
+    @property
+    def role(self):
+        return self.__role
+    
+    @role.setter
+    def role(self, role):
+        self.__role=role
+
+    def __str__(self) -> str:
+        user_info=f"Informacion del usuario:{self.id}, {self.name}, {self.lastname}, {self.dni}, {self.phone}, {self.role}"
+        return user_info
+
 class Admin(User):
 
     def __init__(self, name:str, lastname:str, DNI:str, password:str, phone:str):
         User.__init__(self, name, lastname, DNI, password, phone)
-
-    def enableCient(self, client:object, value:bool):
-        
-        try:
-            db = DataBase("./database.db")
-            print("\nConexion establecida:", db.connect(), "\n")
-            if value:
-                sql=f'UPDATE clients SET available=1 WHERE dni="{client.dni}"'
-            else:
-                sql=f'UPDATE clients SET available=0 WHERE dni="{client.dni}"'
-            db.execSql(sql)
-            print("Cliente modificado")
-        finally:
-            db.disconnect()
-
-    def addProduct(self, product:object): #grabar en la base de datos
-            
-        try:
-            db = DataBase("./database.db")
-            print("\nConexion establecida:", db.connect(), "\n")
-            datos=(product.description, product.price)
-            sql = 'INSERT INTO products(description, price, available) VALUES (?,?, 1)'
-            db.execSql(sql, datos)
-            print("Producto Agregado")
-            return True
-        except:
-            print("Producto repetido")
-            return False
-        finally:
-            db.disconnect()
-
-    def enableProduct(self, product:object, value:bool):
-        
-        try:
-            db = DataBase("./database.db")
-            print("\nConexion establecida:", db.connect(), "\n")
-            if value == True:
-                sql=f'UPDATE products SET available=1 WHERE id="{product.id}"'
-            else:
-                sql=f'UPDATE products SET available=0 WHERE id="{product.id}"'
-            db.execSql(sql)
-            print("Producto modificado")
-        finally:
-            db.disconnect()
-'''
-    def ModPrice(self, product_id, price):
-        
-        try:
-            sql=f'SELECT id FROM clients '
-        finally:   
-        pass
-'''
 
 class Client(User):
     
@@ -126,32 +109,24 @@ class Client(User):
         print(tupla)
         return tupla
     
-    
-
     def makeorder(self, cliente:object, producto:object, quantity):
         
         pass
         
-
     def addedGuest(self, guest:object ,order:object):
         pass
         
-
-class Waiter(User):
-
-    waiter_ID = 0 #Seguir contador de la tabla SQL
-
+class Worker(User):
     def __init__(self):
-        Waiter.waiter_ID =+ 1
-        self.__state = "on_hold"
+        self.__state = True
 
-class Delivery(User):
+class Delivery(Worker):
+    
+    pass
 
-    delivery_ID = 0 #Seguir contador de la tabla SQL
+class Kitchen(Worker):
 
-    def __init__(self):
-        Delivery.delivery_ID =+ 1
-        self.__state = "on_hold"
+    pass
         
 class Guest:
     def __init__(self,name:str, code:str):
