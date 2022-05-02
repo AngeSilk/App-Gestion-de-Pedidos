@@ -54,7 +54,7 @@ class Admin(User):
 
     def __init__(self, name:str, lastname:str, DNI:str, password:str, phone:str):
         User.__init__(self, name, lastname, DNI, password, phone)
-           
+
     def enableCient(self, client:object, value:bool):
         
         try:
