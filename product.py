@@ -33,4 +33,3 @@ class Product:
     def available(self, available:bool):
         self.__available = available
     
-        

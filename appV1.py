@@ -4,8 +4,6 @@ import numpy as np
 
 class App:
 
-    roles=("Administrador","Cliente","Invitado","Delivery","Cocina")
-
     def __init__(self, appname:str, db_name:str) -> None:
         self.__appname= appname
         self.__db = db_name
@@ -34,8 +32,13 @@ class App:
     def user(self, user:User):
         self.__user=user
     
-    def run(self, user:object):
+    def change_role(self):
         
+        #Transforma un usuario Admin a Cliente 
+        if isinstance(self.user, Admin):
+            admin=Admin()
+            admin
+        '''
         if isinstance(user, Admin):
             
             pass
@@ -52,34 +55,15 @@ class App:
 
             order_id=self.enable_Guest(user)
             if order_id:
-                print(f"El invitado {user.name} vinculado a la orden Nº: {order_id}")
+                print(f"El invitado {self.user.name} vinculado a la orden Nº: {order_id}")
             else:
                 print("No se existe una orden con ese codigo")    
                 
                 
         elif isinstance(user, Delivery):
             pass
+        '''
 
-    def get(self, object:object):
-        
-        try:
-            print("\nConexion establecida:", self.db.connect(), "\n")
-            #Productos
-            if isinstance(object, Product):
-                sql='SELECT id, description, price FROM products WHERE available=1'     
-                list=self.db.selectAllSql(sql)
-                self.products.clear()
-                for p in list:
-                    self.products.append(p)
-            #Ususario
-            if isinstance(object, User):
-                sql=f'SELECT * FROM user WHERE id={object.id}' 
-                list=self.db.selectAllSql(sql)
-        except:
-            print("Error al obtener")
-        finally:
-            self.db.disconnect()
-    
     def show_menu(self):
         
         for p in self.products:
@@ -94,20 +78,12 @@ class App:
             dni=user.dni
             passwd=user.password
     
-            sql = f'SELECT id, name, lastname, dni, phone, role FROM user WHERE dni="{dni}" AND password="{passwd}"'
+            sql = f'SELECT id, name, lastname, dni, phone, role, address FROM user WHERE dni="{dni}" AND password="{passwd}"'
             info = self.db.selectAllSql(sql)
-            
             #Devuelve el rol que cumple el usuario y su id.
-            if info!=None:
-                u=info[0]
-                print("Se encontró el usuario")      
-                user=User(int(u[0]), str(u[1]), str(u[2]), str(u[3]), str(u[4]), int(u[5]))
-                self.user=user
-                print(self.user)
-                #info=tupla[0]
-                #user_id=info[0]
-                #user_role=info[1]
-                return True
+            if len(info)!=0:
+                user_info=info[0]
+                return user_info
             else:
                 print("Los datos no coinciden con los usuarios registrados")
                 return False
@@ -180,9 +156,15 @@ class App:
         finally:
             self.db.disconnect()
 
+    #Eliminar de la base de datos
     def delete(self, object:object):
         pass
+    
+    #Modificar en la base de datos
+    def modify(self,object:object, ):
+        pass
 
+    #Verificar en la base de datos
     def db_check(self, object:object):
         
         if isinstance(object, Client):
@@ -195,14 +177,76 @@ class App:
             else: return False
 
         if isinstance(object, User):
-            user = self.validate_user(object)
-            if user:
-                #app.get(user)
-                user:User
-                return user
+            user_info = self.validate_user(object)
+            if user_info:
+                id=int(user_info[0])
+                name=str(user_info[1])
+                lastname=str(user_info[2])
+                dni=str(user_info[3])
+                phone=str(user_info[4])
+                role=int(user_info[5])
+                address=str(user_info[6])
+                user=User(id, name, lastname, dni, phone, role, address)
+                self.user=user
+                return True
             else: return False
 
-'''
+    #Obtener los productos de la base de datos
+    def get_products(self):
+        try:
+            print("\nConexion establecida:", self.db.connect(), "\n")
+            
+            sql='SELECT id, description, price FROM products WHERE available=1'     
+            list=self.db.selectAllSql(sql)
+            self.products.clear()
+            for p in list:
+                self.products.append(p)
+        except:
+            print("No se pudieron obtener los productos")
+        finally:
+            self.db.disconnect()
+
+    '''
+    def get_user(self, object):
+
+        if isinstance(object, User):
+            sql=f'SELECT * FROM user WHERE id={object.id}' 
+            list=self.db.selectAllSql(sql)
+
+        if object==
+    '''
+    def get_worker(self):
+        try:
+            print("\nConexion establecida:", self.db.connect(), "\n")
+            sql=f'SELECT place FROM worker WHERE {self.user.id} AND available=1'     
+            info=self.db.selectOneSql(sql)
+            fun=info[0]
+            return fun
+        except:
+            print("No se pudo obtener el trabajador")
+        finally:
+            self.db.disconnect()
+
+    def generate_sharecode(self):
+        pass
+
+    def set_user(self, mode):
+        user=self.user
+        if mode=="Admin":
+            print(user)
+            admin=Admin(int(user.id),str(user.name),str(user.lastname),str(user.dni),str(user.phone),int(user.role),str(user.address))
+            self.user=admin
+        if mode=="Client":
+            client=Client(user.id, user.name, user.lastname, user.dni, user.phone, user.role, user.address)
+            self.user=client
+        if mode=="Worker":
+            print("Aqui estamos")
+            fun=self.get_worker()
+            worker=Worker(user.id, user.name, user.lastname, user.dni, user.phone, user.role, user.address, fun)
+            self.user=worker
+        print(self.user)  
+       
+'''         
     def ModPrice(self, product_id, price):
         
         try:

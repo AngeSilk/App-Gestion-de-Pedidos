@@ -3,6 +3,7 @@ from tkinter import *
 from users import Client
 from appV1 import *
 
+#Ventana Principal
 class GUI(tk.Tk):
 
     def __init__(self, app:App):
@@ -11,13 +12,15 @@ class GUI(tk.Tk):
         self.__app = app
         self.title(app.name)
 
+        self.__user_name=StringVar()
+
         master = tk.Frame(self)
         master.pack(side="top", fill="both", expand=True)
         master.grid_rowconfigure(0, weight=1)
         master.grid_columnconfigure(0, weight=1)
         
         ancho_ventana = 400
-        alto_ventana = 300
+        alto_ventana = 400
 
         x_ventana = self.winfo_screenwidth() // 2 - ancho_ventana // 2
         y_ventana = self.winfo_screenheight() // 2 - alto_ventana // 2
@@ -34,7 +37,7 @@ class GUI(tk.Tk):
         self.frames = {}
         
         for F in (StartPage, Login, Register, AdminEnter, WorkerEnter, HomeAdmin, 
-                HomeWorker, HomeClient, HomeGuest, JoinOrder):
+                HomeDelivery, HomeKitcken, HomeClient, HomeGuest, JoinOrder, Menu, ShowProducts):
             page_name = F.__name__
             frame = F(parent=master, controller=self)
             self.frames[page_name] = frame
@@ -46,6 +49,11 @@ class GUI(tk.Tk):
     def app(self):
         return self.__app
 
+    @property
+    def user_name(self):
+        self.__user_name.set(f'Bienvenido, {self.app.user.name}')
+        return self.__user_name
+
     def on_closing(self):
         d = Closer(self)
         self.wait_window(d.top)
@@ -55,9 +63,28 @@ class GUI(tk.Tk):
         frame.tkraise()
 
     def forguet_password(self):
-        print("Sos un boludo")
+        print("Opcion no programada")
         pass
+    
+    def update_products(self):
+        self.app.get_products()  
 
+    def share(self):
+        pass
+    
+    def set_mode(self, mode):
+        self.app.set_user(mode)
+        self.user_name
+
+    def back(self, frame):
+        if isinstance(frame, ShowProducts):
+            if isinstance(self.app.user, Admin):
+                self.show_frame("HomeAdmin")
+            if isinstance(self.app.user, Client):
+                self.show_frame("HomeClient")
+            if isinstance(self.app.user, Worker):
+                self.show_frame("HomeWorker")
+    
 #Ventanas que se mostraran
 
 class Closer:
@@ -93,15 +120,15 @@ class Closer:
 
 class StartPage(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=10)
-        self["text"]="Inicio"
+        tk.LabelFrame.__init__(self, parent, pady=10, text="Inicio")
+        
         self.controller = controller
         #label = tk.Label(self, text="This is the start page", font=controller.title_font)
         #label.pack(side="top", fill="x", pady=10)
         
         tk.Button(self, text="Ingresar", command=lambda: controller.show_frame("Login"), height=5, width=40).pack(padx=10)
         tk.Button(self, text="Unirme a un Pedido", command=lambda: controller.show_frame("JoinOrder"), height=5, width=40).pack()
-        tk.Button(self, text="Salir", command=lambda: controller.show_frame("Login"), height=3, width=10).pack(pady=20)
+        tk.Button(self, text="Salir", command=lambda: controller.on_closing(), height=3, width=10).pack(pady=20)
 
 class Register(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
@@ -176,52 +203,75 @@ class Register(tk.LabelFrame):
 
 class Login(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=20, padx=10)
-        self["text"]="Iniciar Sesion"
+        tk.LabelFrame.__init__(self, parent)
+
+        tk.Label(self).pack(fill="x")
+
+        frm2=tk.LabelFrame(self, pady=20, padx=90, text="Iniciar Sesion")
+        frm2.pack(pady=10)
         self.controller = controller
-        
+        #self.parent = parent
         self.dni = StringVar()
         self.passwd= StringVar()
-
-        tk.Label(self, text="DNI:").grid(row=0, column=0)
-        Digits(self, self.dni).grid(row=0, column=1)
-        tk.Label(self, text="Contraseña:", pady=10).grid(row=1, column=0)
-        tk.Entry(self, show="*", textvariable=self.passwd).grid(row=1, column=1)
-        tk.Button(self, text="Olvidé la contraseña", command=lambda: controller.forguet_password()).grid(row=2, column=1)
-        tk.Label(self, text="").grid(row=3, column=2)
-        tk.Button(self, text="Ingresar", command=lambda: self.validate(self.controller)).grid(row=4, column=1)
-        tk.Label(self, text="").grid(row=5, column=0)
-        tk.Button(self, text="Atras", command=lambda: controller.show_frame("StartPage")).grid(row=6, column=0)
-        tk.Button(self, text="Registrarme", command=lambda: controller.show_frame("Register")).grid(row=6, column=1)
+        
+        frm1=Label(frm2)
+        frm1.pack()
+        tk.Label(frm1, text="DNI:").grid(row=0, column=0)
+        Digits(frm1, self.dni).grid(row=0, column=1)
+        tk.Label(frm1, text="Contraseña:", pady=10).grid(row=1, column=0)
+        tk.Entry(frm1, show="*", textvariable=self.passwd).grid(row=1, column=1)
+        tk.Button(frm1, text="Olvidé la contraseña", command=lambda: controller.forguet_password()).grid(row=2, column=1)
+        tk.Label(frm1, text="").grid(row=3, column=2)
+        tk.Button(frm1, text="Ingresar", command=lambda: self.validate(self.controller), width=10, pady=5).grid(row=4, column=1)
+        #tk.Label(frm1, text="").grid(row=5, column=0)
+        frm4=Label(self)
+        frm4.pack(fill="x")
+        tk.Button(frm4, text="Atras", command=lambda: controller.show_frame("StartPage"), width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        tk.Button(frm4, text="Registrarme", command=lambda: controller.show_frame("Register"),width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        
+        frm3=Label(self)
+        frm3.pack(fill="x")
+        self.errorframe=tk.LabelFrame(frm3, text="Error")
+        tk.Label(self.errorframe, text="Los datos NO coinciden con un usuario registrado", fg="red").pack(fill="both", pady=10)
 
         self.dni.trace("w", lambda *args: Limiter(self.dni, 8))
 
+        self.bind_all("<Button-1>", lambda e: self.focus())
+
     def validate(self, controller:GUI):
 
+        #self.errorframe.grid_remove()
         dni=self.dni.get() #Se obtienen los valores ingresados en el campo de dni
         passwd=self.passwd.get() 
-
+        
+        self.dni.set("")
+        self.passwd.set("")
+        
         user=User(dni, passwd) #Se instancia un objeto del tipo user
         
         if controller.app.db_check(user):
             user=controller.app.user
             if user.role == 0:
                 controller.show_frame("AdminEnter")
-            if user.role == 1:
-                controller.show_frame("WorkerEnter")
             if user.role == 2:
+                controller.show_frame("WorkerEnter")
+            if user.role == 1:
                 controller.show_frame("HomeClient")
         else:
+            self.errorframe.pack(fill="x")
             print("Fallo el inicio de sesion")
 
+    def focus(self):
+        self.errorframe.pack_forget()
+       
 class AdminEnter(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=10, padx=10)
+        tk.LabelFrame.__init__(self, parent, pady=20, padx=10)
         self["text"]="Ingresar como"
         self.controller = controller
 
-        tk.Button(self, text="Administrador", command=lambda: controller.show_frame("HomeAdmin"), height=5).pack(fill="x")
-        tk.Button(self, text="Cliente", command=lambda: controller.show_frame("HomeClient"), height=5).pack(fill="x")
+        tk.Button(self, text="Administrador", command=lambda: [controller.show_frame("HomeAdmin"), controller.set_mode("Admin")], height=5).pack(fill="x")
+        tk.Button(self, text="Cliente", command=lambda: [controller.show_frame("HomeClient"), controller.set_mode("Client")], height=5).pack(fill="x")
         tk.Button(self, text="Atras", command=lambda: controller.show_frame("Login"), height=3, width=10).pack(pady=20)
 
 class WorkerEnter(tk.LabelFrame):
@@ -230,38 +280,112 @@ class WorkerEnter(tk.LabelFrame):
         self["text"]="Ingresar como"
         self.controller = controller
 
-        tk.Button(self, text="Trabajador", command=lambda: controller.show_frame("HomeWorker"), height=5).pack(fill="both")
-        tk.Button(self, text="Cliente", command=lambda: controller.show_frame("HomeClient"), height=5).pack(fill="both")
+        tk.Button(self, text="Trabajador", command=lambda: controller.set_mode("Worker"), height=5).pack(fill="both")
+        tk.Button(self, text="Cliente", command=lambda: [controller.show_frame("HomeClient"), controller.set_mode("Client")], height=5).pack(fill="both")
+        tk.Button(self, text="Atras", command=lambda: controller.show_frame("Login"), height=3, width=10).pack(pady=20)
 
 class HomeAdmin(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=10, padx=10)
-        self["text"]="Administrador"
+        tk.LabelFrame.__init__(self, parent, text="Administrador")
         self.controller = controller
-    pass
+        
+        #self.__client_name=StringVar()
+        
+        tk.Label(self,justify='right', textvariable=controller.user_name, pady=10).pack(fill="x")
 
-class HomeWorker(tk.LabelFrame):
-    def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=10, padx=10)
-        self["text"]="Trabajador"
-        self.controller = controller
-    pass
+        #Pedidos
+        self.labelframe1=tk.LabelFrame(self, text="Pedidos")
+        tk.Button(self.labelframe1,text="Recientes",justify='center', width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        tk.Button(self.labelframe1, text="Ver Historial",justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        self.labelframe1.pack(fill="both")
+        
+        #Productos
+        self.labelframe2=tk.LabelFrame(self, text="Productos")
+        tk.Button(self.labelframe2,text="Mostrar",justify='center', command=lambda: [controller.update_products(),controller.show_frame("ShowProducts")], width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        tk.Button(self.labelframe2, text="Modificar",justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        self.labelframe2.pack(fill="both")
+        
+        #Clientes
+        self.labelframe3=tk.LabelFrame(self, text="Clientes")
+
+        self.labelframe3.pack(fill="both")
+        
+        #Trabajadores
+        self.labelframe4=tk.LabelFrame(self, text="Trabajadores")
+    
+        self.labelframe4.pack(fill="both")
+        
+        tk.Button(self, text="Atras", command=lambda: controller.show_frame("Login"), height=3, width=10).pack(pady=20)
 
 class HomeClient(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=10, padx=10)
-        self["text"]="Cliente"
+        tk.LabelFrame.__init__(self, parent, text="Cliente")
         self.controller = controller
-    pass
+        
+        tk.Label(self,justify='right', textvariable=controller.user_name, pady=10).pack(fill="x")
 
+        #Menu
+        self.labelframe1=tk.LabelFrame(self, text="Menu")
+        tk.Button(self.labelframe1,text="Mostrar",command=lambda: [controller.update_products(), controller.show_frame("ShowProducts")],justify='center', width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        self.labelframe1.pack(fill="both")
+
+        #Pedidos
+        self.labelframe1=tk.LabelFrame(self, text="Pedidos")
+        tk.Button(self.labelframe1,text="Nuevo", command=lambda: [controller.update_products(), controller.show_frame()], justify='center', width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        tk.Button(self.labelframe1, text="Ver Historial",justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        self.labelframe1.pack(fill="both")
+
+        #Usuario
+        self.labelframe2=tk.LabelFrame(self, text="Configuracion")
+        tk.Button(self.labelframe2,text="Modificar mis datos", justify='center', width=30, pady=8).grid(column=2, row=0, padx=40, pady=15)
+        #tk.Button(self.labelframe2, text="Ver Historial",justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        self.labelframe2.pack(fill="both")
+        
+        #Control
+        frm2=Label(self)
+        Button(frm2, text="Salir", command=lambda: controller.on_closing() ,justify='center', width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        Button(frm2, text="Atras", command=lambda: controller.show_frame("Login"), justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        frm2.pack()
+
+class HomeDelivery(tk.LabelFrame):
+    def __init__(self, parent, controller:GUI):
+        tk.LabelFrame.__init__(self, parent)
+        frm0=tk.LabelFrame(self, parent, pady=10, padx=10, text="Delivery")
+        frm0.pack()
+        self.controller = controller
+
+        #Opciones de un delivery
+
+        #Control
+        frm_control=Label(self)
+        Button(frm_control, text="Salir", command=lambda: controller.on_closing() ,justify='center', width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        Button(frm_control, text="Atras", command=lambda: controller.show_frame("Login"), justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        frm_control.pack()
+
+class HomeKitcken(tk.LabelFrame):
+    def __init__(self, parent, controller:GUI):
+        tk.LabelFrame.__init__(self, parent)
+        frm0=tk.LabelFrame(self, parent, pady=10, padx=10, text="Cocina")
+        frm0.pack()
+        self.controller = controller
+
+        #Opciones de la cocina
+
+        #Control
+        frm_control=Label(self)
+        Button(frm_control, text="Salir", command=lambda: controller.on_closing() ,justify='center', width=20, pady=8).grid(column=2, row=0, padx=20, pady=15)
+        Button(frm_control, text="Atras", command=lambda: controller.show_frame("Login"), justify='center',width=20, pady=8).grid(column=4, row=0, padx=25, pady=15)
+        frm_control.pack()
+    
 class HomeGuest(tk.LabelFrame):
-    def __init__(self, parent, controller):
-        tk.LabelFrame.__init__(self, parent, pady=10, padx=10)
-        self["text"]="Bienvenido"
+    def __init__(self, parent, controller:GUI):
+        tk.LabelFrame.__init__(self, parent, pady=10, padx=10, text="Invitadi")
+        #self.__controller = controller
+        tk.Label(self,justify='right', textvariable=controller.user_name, pady=10).pack(fill="x")
 
 class JoinOrder(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
-        tk.LabelFrame.__init__(self, parent, pady=20)
+        tk.LabelFrame.__init__(self, parent, pady=40, padx=100)
         self["text"]="Ingresar como invitado"
         
         self.controller = controller
@@ -284,12 +408,87 @@ class JoinOrder(tk.LabelFrame):
 
         guest = Guest(nick, code)
 
-        if controller.db_check(guest):
+        if controller.app.db_check(guest):
             controller.show_frame("HomeGuest")
         else:
             print("No se encontó usuario con ese codigo")
 
-'''
+class Menu(tk.Label):
+    def __init__(self, parent, controller:GUI):
+        tk.Label.__init__(self, parent)
+
+        self.__products=[]
+        self.__amount=StringVar()
+        
+        frm0=Label(self, text="Realizar un Pedido", font=("Bahnschrift", 15), pady=10)
+        frm0.pack()
+        frm1 = LabelFrame(frm0, text="Menu", pady=10, padx=20, font=("Courrier", 10))
+        frm1.pack()
+        
+        self.__products=controller.app.product
+        self.__amount.set("$0")
+        a=[]
+        e=[]
+        Label(frm1, text="Variedades", justify=LEFT, font=("Bahnschrift", 10)).grid(column=1, row=0)
+        Label(frm1, text="Precio      \nUnitario      ", justify="center", font=("Bahnschrift", 10)).grid(column=2, row=0)
+        Label(frm1, text="Cant.", font=("Bahnschrift", 10)).grid(column=3, row=0)
+        for i in range(len(self.__products)):
+            Label(frm1, text=f"     {self.__products[i][1]}     ", font=("Bahnschrift", 14)).grid(column=1, row=i+1)
+            Label(frm1, text=f"${self.__products[i][2]}   ", font=("Bahnschrift", 14)).grid(column=2, row=i+1)
+            e.append(StringVar())
+            a.append(Spinbox(frm1, textvariable=e[i], from_=0, to=48, width=5, command=lambda i=i: change(i)))
+            a[i].grid(column=3, row=i+1)
+        
+        frm3=LabelFrame(frm0, text="Total a Pagar", pady=5, padx=5)
+        Label(frm3, textvariable=self.__amount, font=("Bahnschrift", 15), width=20).grid(column=2,row=i+2)
+        frm3.pack()
+        
+        frm2=LabelFrame(frm0, text="Acciones", pady=10)
+        frm2.pack()
+
+        Button(frm2, text="Volver Atras", command=lambda: [controller.show_frame("HomeClient"), reset()], width=10).grid(column=0, row=0, padx=4)
+        Button(frm2, text="Compartir", command=lambda: [controller.share()], width=10).grid(column=1, row=0, padx=4)
+        Button(frm2, text="Continuar", command=lambda: take_order(), width=10).grid(column=2, row=0, padx=4)
+    
+
+        def change(i):
+            total=0
+            cants=0
+            for i in range(len(self.__products)):
+                subtotal=0
+                price=int(self.__products[i][2])
+                cant=int(a[i].get())
+                cants+=cant
+                subtotal=price*cant
+                total+=subtotal
+            self.__amount.set(f'${total}')
+        
+        def reset():
+            self.__amount.set("$0")
+            for i in range(len(e)):
+                e[i].set(0)
+
+class ShowProducts(tk.Label):
+    
+    def __init__(self, parent, controller:GUI):
+        tk.Label.__init__(self, parent)
+        #frm0=Label(self)
+        self.__products=[]
+        self.__products=controller.app.product
+        
+        frm1 = LabelFrame(self, text="Productos", pady=10, padx=20, font=("Courrier", 10))
+        frm1.pack()
+        
+        Label(frm1, text="Variedades", justify=LEFT, font=("Bahnschrift", 10)).grid(column=1, row=0)
+        Label(frm1, text="Precio      \nUnitario      ", justify="center", font=("Bahnschrift", 10)).grid(column=2, row=0)
+        for i in range(len(self.__products)):
+            Label(frm1, text=f"     {self.__products[i][1]}     ", font=("Bahnschrift", 14)).grid(column=1, row=i+1)
+            Label(frm1, text=f"${self.__products[i][2]}   ", font=("Bahnschrift", 14)).grid(column=2, row=i+1)
+        frm2 = Label(self)
+        frm2.pack()
+        Button(frm2, text="Volver Atras", command=lambda: controller.back(self), width=10).pack()
+
+''' 
 class EnterAs(tk.LabelFrame):
     def __init__(self, parent, controller:GUI):
         tk.LabelFrame.__init__(self, parent, pady=10, padx=10)
@@ -313,7 +512,8 @@ class EnterAs(tk.LabelFrame):
             tk.Button(self, text="Cliente", command=lambda: controller.show_frame("HomeClient"), height=5).pack(fill="both")
 '''
 
-#Limitadores 
+#Limitadores
+
 class Limiter:
 
     def __init__(self, widget:StringVar, n:int) -> None:
@@ -399,7 +599,6 @@ class Digits(tk.Entry):
         if len(old_value)==1:
             self.set=('')
     '''
-
 
 def main():
     app=App("Gestion de Pedidos para Restaurante", "database.db")

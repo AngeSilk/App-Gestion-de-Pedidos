@@ -25,7 +25,6 @@ class Menu(tk.Tk):
         pass
 
 
-
 productos=[(1,"Humita", 120),(3,"Pollo",220),(5,"Salame",500)]
 
 Menu(productos).mainloop()
