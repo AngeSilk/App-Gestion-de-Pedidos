@@ -14,7 +14,7 @@ class GUI():
         tk.Button(window, text="Ingresar", width=30, height=5, command=self.show_menu).grid(row=0, column=0)
         tk.Button(window, text="Unirme a un pediodo", width=30, height=5, command=self.join).grid(row=1, column=0)
 
-    
+
     def login(self):
         tk.Entry(window)
         pass
@@ -36,7 +36,7 @@ class GUI():
         tk.Label(self).grid(row=self.count)
         tk.Button(self, text='Quit', command=self.destroy).grid(row=self.count+1, column=2)
         tk.Button(self, text='Continue', command=self.take_order).grid(row=self.count+1, column=4)
-    
+
     def take_order(self):
         print()
 

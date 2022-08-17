@@ -1,23 +1,28 @@
-import tkinter as tk
+import datetime
+import math
+#now=datetime.datetime.now()
+time = datetime.datetime
 
-class Lotfi(tk.Entry):
-    def __init__(self, master=None, **kwargs):
-        self.var = tk.StringVar()
-        tk.Entry.__init__(self, master, textvariable=self.var, **kwargs)
-        self.old_value = ''
-        self.var.trace('w', self.check)
-        self.get, self.set = self.var.get, self.var.set
+print(time.now())
+#print(now)
 
-    def check(self, *args):
-        if self.get().isdigit(): 
-            # the current value is only digits; allow this
-            self.old_value = self.get()
-        else:
-            # there's non-digit characters in the input; reject this 
-            self.set(self.old_value)
+#print(time.now().time().isoformat(timespec='minutes'))
+#print(time.now().date())
 
-#demo:
-window = tk.Tk()
-From_entry=Lotfi(window, width=25)
-From_entry.grid(column=1,row=2,padx=5)
-window.mainloop()
+#time = datetime.datetime.fromisoformat(str)
+#print(time.time().isoformat(timespec='seconds'))
+#print(now.date().strftime("%d-%m-%y"))
+
+strt = '2022-07-28 13:57:47.624667'#print(now.date())
+'''
+diference = time1 - time2
+print(time1)
+print(time2)
+print(diference.seconds/60)
+'''
+datetime_start= datetime.datetime.fromisoformat(strt)
+datetime_end= time.now()
+
+minutes_diff = (datetime_end - datetime_start).total_seconds() / 60.0
+parte_decimal, parte_entera = math.modf(minutes_diff)
+print(str(int(parte_entera)),':',str(int(parte_decimal*60)).rjust(2, '0'))

@@ -1,7 +1,7 @@
 import tkinter as tk
 
 class Menu(tk.Tk):
-    
+
     def __init__(self, products):
         tk.Tk.__init__(self)
 
@@ -28,5 +28,4 @@ class Menu(tk.Tk):
 productos=[(1,"Humita", 120),(3,"Pollo",220),(5,"Salame",500)]
 
 Menu(productos).mainloop()
-    
 

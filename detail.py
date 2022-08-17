@@ -1,6 +1,6 @@
 
 class Detail:
-    
+
     def __init__(self, order:int, product:int, guest:str, qty:int):
         self.__ref_order = order
         self.__ref_product = product
@@ -8,7 +8,7 @@ class Detail:
         self.__qty = qty
         self.__subtotal = 0.0
         self.__available = True
-    
+
     @property
     def ref_order(self):
         return self.__ref_order
@@ -32,10 +32,10 @@ class Detail:
     @property
     def available(self):
         return self.__available
-    
+
     @available.setter
     def available(self, available:bool):
         self.__available = available
-    
+
 
 
